@@ -85,15 +85,53 @@ export const AuthProvider = ({ children }) => {
       const response = await authService.register(userData)
       console.log('AuthContext - Register response:', response)
       
-      if (response.success) {
-        return { success: true, user: response.user, token: response.token }
+      // Axios met les données dans response.data
+      const result = response.data
+      console.log('AuthContext - Resultat extrait de response.data:', result)
+      
+      // Si le statut est 201, l'inscription a réussi
+      if (response.status === 201) {
+        return { 
+          success: true, 
+          user: result.user, 
+          token: result.token 
+        }
       } else {
-        console.log('AuthContext - Register failed:', response.error)
-        return { success: false, error: response.error, type: response.type }
+        console.log('AuthContext - Register failed:', result.error)
+        return { success: false, error: result.error, type: result.type }
       }
     } catch (error) {
       console.error('AuthContext - Register error:', error)
-      return { success: false, error: 'Erreur lors de l\'inscription' }
+      
+      // Extraire le message d'erreur de la réponse du backend
+      let errorMessage = 'Erreur lors de l\'inscription'
+      let errorType = 'general_error'
+      
+      if (error.response?.data) {
+        const errorData = error.response.data
+        
+        if (errorData.error) {
+          errorMessage = errorData.error
+        } else if (errorData.message) {
+          errorMessage = errorData.message
+        } else if (errorData.detail) {
+          errorMessage = errorData.detail
+        }
+        
+        if (errorData.type) {
+          errorType = errorData.type
+        }
+        
+        // Gérer les erreurs de validation Django
+        if (error.response.status === 400 && typeof errorData === 'object') {
+          const firstErrorKey = Object.keys(errorData)[0]
+          if (firstErrorKey && Array.isArray(errorData[firstErrorKey])) {
+            errorMessage = errorData[firstErrorKey][0]
+          }
+        }
+      }
+      
+      return { success: false, error: errorMessage, type: errorType }
     } finally {
       setLoading(false)
     }

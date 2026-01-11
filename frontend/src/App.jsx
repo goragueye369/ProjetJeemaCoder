@@ -5,6 +5,9 @@ import ProtectedRoute from './components/ProtectedRoute'
 import Dashboard from './pages/Dashboard'
 import HotelsList from './pages/HotelsList'
 import HotelDetails from './pages/HotelDetails'
+import Bookings from './pages/Bookings'
+import Admins from './pages/Admins'
+import Settings from './pages/Settings'
 import CreateHotel from './pages/CreateHotel'
 import EditHotel from './pages/EditHotel'
 import Login from './pages/Login'
@@ -99,6 +102,39 @@ function App() {
                 <Sidebar />
                 <div className="flex-1">
                   <HotelDetails />
+                </div>
+              </div>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/bookings" element={
+            <ProtectedRoute>
+              <div className="flex">
+                <Sidebar />
+                <div className="flex-1">
+                  <Bookings />
+                </div>
+              </div>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/admins" element={
+            <ProtectedRoute>
+              <div className="flex">
+                <Sidebar />
+                <div className="flex-1">
+                  <Admins />
+                </div>
+              </div>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/settings" element={
+            <ProtectedRoute>
+              <div className="flex">
+                <Sidebar />
+                <div className="flex-1">
+                  <Settings />
                 </div>
               </div>
             </ProtectedRoute>

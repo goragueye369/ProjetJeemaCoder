@@ -39,6 +39,7 @@ const Register = () => {
     
     if (result.success) {
       console.log('Register - Inscription réussie:', result)
+      console.log('Register - Redirection vers /login avec message')
       navigate('/login', { 
         state: { 
           message: 'Inscription réussie ! Veuillez vous connecter avec vos nouveaux identifiants.',
@@ -64,54 +65,7 @@ const Register = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header moderne correspondant au design prototype */}
-      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <Link to="/" className="text-2xl font-bold text-red-600">
-                RED Product
-              </Link>
-            </div>
-            <nav className="flex items-center space-x-8">
-              <Link 
-                to="/" 
-                className="text-gray-700 hover:text-red-600 transition-colors font-medium"
-              >
-                Accueil
-              </Link>
-              <Link 
-                to="/register" 
-                className="text-red-600 font-medium"
-              >
-                S'inscrire
-              </Link>
-              <Link 
-                to="/login" 
-                className="text-gray-700 hover:text-red-600 transition-colors font-medium"
-              >
-                Connexion
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </header>
-
-      {/* Hero Section moderne comme dans le prototype */}
-      <section className="bg-gradient-to-r from-red-600 to-red-700 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Rejoignez RED Product
-              <span className="block text-red-200">dès aujourd'hui</span>
-            </h1>
-            <p className="text-xl text-red-100 mb-8 max-w-3xl mx-auto">
-              Créez votre compte et accédez à notre sélection exclusive de produits et services.
-            </p>
-          </div>
-        </div>
-      </section>
-
+      
       <div className="max-w-md w-full mx-auto sm:px-6 lg:px-8 py-8">
         <div className="bg-white py-8 px-6 shadow-lg rounded-lg">
           <div className="text-center">
@@ -144,6 +98,24 @@ const Register = () => {
                   onChange={handleChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   placeholder="Votre prénom"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="last_name" className="block text-sm font-medium text-gray-700 mb-1">
+                Nom
+              </label>
+              <div className="mt-1">
+                <input
+                  id="last_name"
+                  name="last_name"
+                  type="text"
+                  required
+                  value={formData.last_name}
+                  onChange={handleChange}
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  placeholder="Votre nom"
                 />
               </div>
             </div>

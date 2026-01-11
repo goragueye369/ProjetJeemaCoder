@@ -17,18 +17,28 @@ class UserSerializer(serializers.Serializer):
     is_active = serializers.BooleanField(default=True)
     created_at = serializers.DateTimeField(read_only=True)
 
-    def create(self, validated_data):
+    def validate(self, data):
         # Vérifier la correspondance des mots de passe
-        password = validated_data.get('password')
-        password_confirmation = validated_data.get('password_confirmation')
+        password = data.get('password')
+        password_confirmation = data.get('password_confirmation')
         
         if password != password_confirmation:
-            raise serializers.ValidationError('Les mots de passe ne correspondent pas')
+            raise serializers.ValidationError({
+                'password_confirmation': 'Les mots de passe ne correspondent pas'
+            })
         
         # Vérifier si l'email existe déjà
-        email = validated_data.get('email')
+        email = data.get('email')
         if User.objects.filter(email=email).exists():
-            raise serializers.ValidationError(f'Cet email {email} est déjà utilisé')
+            raise serializers.ValidationError({
+                'email': 'Cet email est déjà utilisé'
+            })
+        
+        return data
+
+    def create(self, validated_data):
+        # Supprimer password_confirmation des données validées
+        validated_data.pop('password_confirmation', None)
         
         # Générer un username unique à partir de l'email si non fourni
         if not validated_data.get('username'):
