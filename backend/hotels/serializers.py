@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from mongoengine.queryset import QuerySet
-from .models import Hotel, Room, Booking, User
+from .models import Hotel, Room, Booking
+from django.contrib.auth.models import User
 from django.conf import settings
 import os
 import uuid
@@ -12,17 +12,31 @@ class UserSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     first_name = serializers.CharField(max_length=30, required=False, allow_blank=True)
     last_name = serializers.CharField(max_length=30, required=False, allow_blank=True)
+    password = serializers.CharField(write_only=True, min_length=8)
+    password_confirmation = serializers.CharField(write_only=True, min_length=8)
     is_active = serializers.BooleanField(default=True)
     created_at = serializers.DateTimeField(read_only=True)
 
     def create(self, validated_data):
+        # Vérifier la correspondance des mots de passe
+        password = validated_data.get('password')
+        password_confirmation = validated_data.get('password_confirmation')
+        
+        if password != password_confirmation:
+            raise serializers.ValidationError('Les mots de passe ne correspondent pas')
+        
+        # Vérifier si l'email existe déjà
+        email = validated_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise serializers.ValidationError(f'Cet email {email} est déjà utilisé')
+        
         # Générer un username unique à partir de l'email si non fourni
         if not validated_data.get('username'):
             base_username = validated_data['email'].split('@')[0]
             username = base_username
             counter = 1
             # Vérifier l'unicité du username
-            while User.objects(username=username).first():
+            while User.objects.filter(username=username).exists():
                 username = f"{base_username}{counter}"
                 counter += 1
             validated_data['username'] = username
@@ -34,7 +48,18 @@ class UserSerializer(serializers.Serializer):
         
         # Créer l'utilisateur avec les champs validés
         try:
-            return User.objects.create(**validated_data)
+            # Créer l'objet User directement avec tous les champs
+            user_data = {
+                'username': validated_data['username'],
+                'email': validated_data['email'],
+                'password': validated_data['password'],
+                'first_name': validated_data.get('first_name', ''),
+                'last_name': validated_data.get('last_name', ''),
+                'is_active': True
+            }
+            user = User.objects.create(**user_data)
+            print(f"DEBUG: Utilisateur créé: {user.email}")
+            return user
         except Exception as e:
             print(f"Erreur création utilisateur: {e}")
             raise serializers.ValidationError(str(e))
@@ -93,14 +118,26 @@ class HotelSerializer(serializers.Serializer):
     def get_image_url(self, obj):
         """Retourner l'URL complète de l'image ou null"""
         if obj.image:
+            # Si c'est un objet ImageFieldFile
+            if hasattr(obj.image, 'url'):
+                image_url = obj.image.url
+                # Convertir en URL absolue si nécessaire
+                if image_url.startswith('/'):
+                    base_url = getattr(settings, 'BASE_URL', 'http://127.0.0.1:8000')
+                    return f"{base_url}{image_url}"
+                return image_url
             # Si l'image est une chaîne de caractères (chemin du fichier)
-            if isinstance(obj.image, str):
-                # Utiliser l'URL de base depuis les settings
-                base_url = getattr(settings, 'BASE_URL', 'http://localhost:8000')
+            elif isinstance(obj.image, str):
+                base_url = getattr(settings, 'BASE_URL', 'http://127.0.0.1:8000')
                 return f"{base_url}/media/{obj.image}"
         return None
 
     def create(self, validated_data):
+        # Vérifier si le nom de l'hôtel existe déjà
+        name = validated_data.get('name')
+        if Hotel.objects.filter(name=name).exists():
+            raise serializers.ValidationError(f'Un hôtel avec le nom "{name}" existe déjà')
+        
         # Gérer l'upload d'image si présent
         image_file = validated_data.pop('image', None)
         

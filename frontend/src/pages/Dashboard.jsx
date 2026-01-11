@@ -20,7 +20,7 @@ const Dashboard = () => {
     try {
       setLoading(true)
       
-      // Récupérer les vraies données depuis MongoDB
+      // Récupérer les données depuis PostgreSQL
       const [hotelsResponse, bookingsResponse, usersResponse] = await Promise.all([
         hotelService.getAllHotels(),
         bookingService.getAllBookings(),
@@ -59,155 +59,216 @@ const Dashboard = () => {
         fill="currentColor"
         viewBox="0 0 20 20"
       >
-        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364 1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8 2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539 1.118l1.07 3.292z" />
       </svg>
     ))
   }
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-lg">Chargement du dashboard...</div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-600"></div>
       </div>
     )
   }
 
   return (
-    <div className="p-8 bg-background min-h-full">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-text-primary">Dashboard</h1>
-        <p className="text-text-secondary mt-2">Bienvenue chez Luxe Hotels - Système de Gestion Hôtelière</p>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white rounded-luxury border border-luxury-200 p-6 hover:shadow-luxury transition-all duration-300">
-          <div className="flex items-center justify-between mb-4">
-            <div className={`w-12 h-12 bg-gradient-to-r from-primary to-ocean rounded-luxury flex items-center justify-center text-white text-xl shadow-soft`}>
-              🏨
-            </div>
-            <span className="text-sm font-medium text-green-600 bg-green-50 px-2 py-1 rounded-button">
-              {stats.hotels > 0 ? `+${stats.hotels}` : '0'}
-            </span>
-          </div>
-          <div>
-            <p className="text-text-secondary text-sm">Hôtels</p>
-            <p className="text-3xl font-bold text-text-primary mt-2">{stats.hotels}</p>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-luxury border border-luxury-200 p-6 hover:shadow-luxury transition-all duration-300">
-          <div className="flex items-center justify-between mb-4">
-            <div className={`w-12 h-12 bg-gradient-to-r from-ocean to-primary rounded-luxury flex items-center justify-center text-white text-xl shadow-soft`}>
-              🛏️
-            </div>
-            <span className="text-sm font-medium text-green-600 bg-green-50 px-2 py-1 rounded-button">
-              {stats.rooms > 0 ? `+${stats.rooms}` : '0'}
-            </span>
-          </div>
-          <div>
-            <p className="text-text-secondary text-sm">Chambres</p>
-            <p className="text-3xl font-bold text-text-primary mt-2">{stats.rooms}</p>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-luxury border border-luxury-200 p-6 hover:shadow-luxury transition-all duration-300">
-          <div className="flex items-center justify-between mb-4">
-            <div className={`w-12 h-12 bg-gradient-to-r from-accent to-earth rounded-luxury flex items-center justify-center text-white text-xl shadow-soft`}>
-              📅
-            </div>
-            <span className="text-sm font-medium text-green-600 bg-green-50 px-2 py-1 rounded-button">
-              {stats.bookings > 0 ? `+${stats.bookings}` : '0'}
-            </span>
-          </div>
-          <div>
-            <p className="text-text-secondary text-sm">Réservations</p>
-            <p className="text-3xl font-bold text-text-primary mt-2">{stats.bookings}</p>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-luxury border border-luxury-200 p-6 hover:shadow-luxury transition-all duration-300">
-          <div className="flex items-center justify-between mb-4">
-            <div className={`w-12 h-12 bg-gradient-to-r from-nature to-green-600 rounded-luxury flex items-center justify-center text-white text-xl shadow-soft`}>
-              👥
-            </div>
-            <span className="text-sm font-medium text-green-600 bg-green-50 px-2 py-1 rounded-button">
-              {stats.users > 0 ? `+${stats.users}` : '0'}
-            </span>
-          </div>
-          <div>
-            <p className="text-text-secondary text-sm">Clients</p>
-            <p className="text-3xl font-bold text-text-primary mt-2">{stats.users}</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Quick Actions */}
-        <div className="lg:col-span-2 bg-white rounded-luxury border border-luxury-200 p-6 hover:shadow-luxury transition-all duration-300">
-          <h2 className="text-xl font-semibold text-text-primary mb-6">Actions rapides</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Link
-              to="/hotels/create"
-              className="flex items-center p-4 bg-gradient-to-r from-primary-50 to-primary-100 border border-primary rounded-luxury hover:from-primary-100 hover:to-primary-200 hover:shadow-luxury transition-all duration-300"
-            >
-              <div className="w-10 h-10 bg-gradient-to-r from-primary to-ocean rounded-luxury flex items-center justify-center text-white mr-4 shadow-soft">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path>
-                </svg>
+    <div className="min-h-screen bg-gray-100">
+      {/* Statistiques */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white rounded-luxury border border-luxury-200 p-6 hover:shadow-luxury transition-all duration-300">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-text-primary">Hôtels</h3>
+              <div className="w-8 h-8 bg-gradient-to-br from-primary to-ocean rounded-luxury flex items-center justify-center shadow-soft">
+                <span className="text-white font-bold text-sm">{stats.hotels}</span>
               </div>
+            </div>
+            <p className="text-text-secondary text-sm">Total des hôtels enregistrés</p>
+          </div>
+
+          <div className="bg-white rounded-luxury border border-luxury-200 p-6 hover:shadow-luxury transition-all duration-300">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-text-primary">Chambres</h3>
+              <div className="w-8 h-8 bg-gradient-to-br from-primary to-ocean rounded-luxury flex items-center justify-center shadow-soft">
+                <span className="text-white font-bold text-sm">{stats.rooms}</span>
+              </div>
+            </div>
+            <p className="text-text-secondary text-sm">Total des chambres disponibles</p>
+          </div>
+
+          <div className="bg-white rounded-luxury border border-luxury-200 p-6 hover:shadow-luxury transition-all duration-300">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-text-primary">Réservations</h3>
+              <div className="w-8 h-8 bg-gradient-to-br from-primary to-ocean rounded-luxury flex items-center justify-center shadow-soft">
+                <span className="text-white font-bold text-sm">{stats.bookings}</span>
+              </div>
+            </div>
+            <p className="text-text-secondary text-sm">Total des réservations</p>
+          </div>
+
+          <div className="bg-white rounded-luxury border border-luxury-200 p-6 hover:shadow-luxury transition-all duration-300">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-text-primary">Utilisateurs</h3>
+              <div className="w-8 h-8 bg-gradient-to-br from-primary to-ocean rounded-luxury flex items-center justify-center shadow-soft">
+                <span className="text-white font-bold text-sm">{stats.users}</span>
+              </div>
+            </div>
+            <p className="text-text-secondary text-sm">Total des utilisateurs</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Actions rapides */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Link 
+            to="/hotels/create" 
+            className="bg-white rounded-luxury border border-luxury-200 p-6 hover:shadow-luxury transition-all duration-300 group"
+          >
+            <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-semibold text-text-primary">Créer un hôtel</h3>
                 <p className="text-text-secondary text-sm">Ajouter un nouvel hôtel</p>
               </div>
-            </Link>
-
-            <Link
-              to="/hotels"
-              className="flex items-center p-4 bg-white border border-luxury-200 rounded-luxury hover:border-primary hover:bg-primary-50 hover:text-primary transition-all duration-300"
-            >
-              <div className="w-10 h-10 bg-gradient-to-r from-ocean to-primary rounded-luxury flex items-center justify-center text-white mr-4 shadow-soft">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+              <div className="w-8 h-8 bg-gradient-to-br from-primary to-ocean rounded-luxury flex items-center justify-center shadow-soft group-hover:scale-110 transition-transform duration-200">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4m8 0l8 8-8-8z"></path>
                 </svg>
-              </div>
-              <div>
-                <h3 className="font-semibold text-text-primary">Liste des hôtels</h3>
-                <p className="text-text-secondary text-sm">Explorer tous les hôtels</p>
-              </div>
-            </Link>
-
-            <div className="flex items-center p-4 bg-white border border-luxury-200 rounded-luxury hover:border-nature hover:bg-nature-50 hover:text-nature transition-all duration-300 cursor-pointer">
-              <div className="w-10 h-10 bg-gradient-to-r from-nature to-green-600 rounded-luxury flex items-center justify-center text-white mr-4 shadow-soft">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002 2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002 2m0 0V5a2 2 0 012-2h4a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                </svg>
-              </div>
-              <div>
-                <h3 className="font-semibold text-text-primary">Statistiques</h3>
-                <p className="text-text-secondary text-sm">Voir les rapports</p>
               </div>
             </div>
+          </Link>
 
-            <div className="flex items-center p-4 bg-white border border-luxury-200 rounded-luxury hover:border-purple-500 hover:bg-purple-50 transition-all duration-300 cursor-pointer">
-              <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-600 rounded-luxury flex items-center justify-center text-white mr-4 shadow-soft">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-              </div>
+          <Link 
+            to="/bookings" 
+            className="bg-white rounded-luxury border border-luxury-200 p-6 hover:shadow-luxury transition-all duration-300 group"
+          >
+            <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-semibold text-text-primary">Réservations</h3>
                 <p className="text-text-secondary text-sm">Gérer les réservations</p>
               </div>
+              <div className="w-8 h-8 bg-gradient-to-br from-primary to-ocean rounded-luxury flex items-center justify-center shadow-soft group-hover:scale-110 transition-transform duration-200">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+              </div>
+            </div>
+          </Link>
+
+          <Link 
+            to="/users" 
+            className="bg-white rounded-luxury border border-luxury-200 p-6 hover:shadow-luxury transition-all duration-300 group"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold text-text-primary">Utilisateurs</h3>
+                <p className="text-text-secondary text-sm">Gérer les utilisateurs</p>
+              </div>
+              <div className="w-8 h-8 bg-gradient-to-br from-primary to-ocean rounded-luxury flex items-center justify-center shadow-soft group-hover:scale-110 transition-transform duration-200">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 016-6h2a6 6 0 016 6v1m0 0l-3-3m0 6l3-3m-6-6v6h6"></path>
+                </svg>
+              </div>
+            </div>
+          </Link>
+        </div>
+      </section>
+
+      {/* Informations détaillées sur les hôtels */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-semibold text-gray-900">Informations sur les hôtels</h2>
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-500">Total:</span>
+              <span className="bg-gray-800 text-white px-3 py-1 rounded-full text-sm font-bold">
+                {stats.hotels} hôtels
+              </span>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h3 className="font-semibold text-gray-900 mb-2">📊 Statistiques générales</h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Total hôtels:</span>
+                  <span className="font-medium text-gray-900">{stats.hotels}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Total chambres:</span>
+                  <span className="font-medium text-gray-900">{stats.rooms}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Total réservations:</span>
+                  <span className="font-medium text-gray-900">{stats.bookings}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h3 className="font-semibold text-gray-900 mb-2">🏨 Catégories</h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Hôtels de luxe:</span>
+                  <span className="font-medium text-gray-900">
+                    {recentHotels.filter(h => h.category === 'luxury').length}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Hôtels business:</span>
+                  <span className="font-medium text-gray-900">
+                    {recentHotels.filter(h => h.category === 'business').length}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Resorts:</span>
+                  <span className="font-medium text-gray-900">
+                    {recentHotels.filter(h => h.category === 'resort').length}
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h3 className="font-semibold text-gray-900 mb-2">💰 Prix moyens</h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Prix moyen:</span>
+                  <span className="font-medium text-gray-900">
+                    {recentHotels.length > 0 
+                      ? Math.round(recentHotels.reduce((acc, h) => acc + (h.price_per_night || 0), 0) / recentHotels.length)
+                      : 0} €
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Prix min:</span>
+                  <span className="font-medium text-gray-900">
+                    {recentHotels.length > 0 
+                      ? Math.min(...recentHotels.map(h => h.price_per_night || 0))
+                      : 0} €
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Prix max:</span>
+                  <span className="font-medium text-gray-900">
+                    {recentHotels.length > 0 
+                      ? Math.max(...recentHotels.map(h => h.price_per_night || 0))
+                      : 0} €
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+      </section>
 
-        {/* Recent Hotels from MongoDB */}
+      {/* Recent Hotels */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         <div className="bg-white rounded-luxury border border-luxury-200 p-6 hover:shadow-luxury transition-all duration-300">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-text-primary">Hôtels récents (MongoDB)</h2>
+            <h2 className="text-xl font-semibold text-text-primary">Hôtels récents</h2>
             <div className="w-8 h-8 bg-gradient-to-br from-primary to-ocean rounded-luxury flex items-center justify-center shadow-soft">
               <span className="text-white font-bold text-sm">{stats.hotels}</span>
             </div>
@@ -219,19 +280,19 @@ const Dashboard = () => {
               </div>
             ) : (
               recentHotels.map((hotel, index) => (
-                <div key={hotel.id || index} className="flex items-center justify-between p-3 bg-luxury-50 rounded-luxury hover:bg-luxury-100 transition-all duration-200 cursor-pointer">
+                <div key={hotel.id || index} className="flex items-center p-3 bg-luxury-50 rounded-luxury hover:bg-luxury-100 transition-all duration-200 cursor-pointer">
                   {/* Image de l'hôtel */}
-                  <div className="w-16 h-16 bg-gray-200 rounded-luxury mr-4 flex-shrink-0">
+                  <div className="w-12 h-12 bg-gray-200 rounded-lg mr-3 flex-shrink-0">
                     {hotel.image_url ? (
                       <img 
                         src={`http://localhost:8000${hotel.image_url}`} 
                         alt={hotel.name}
-                        className="w-full h-full object-cover rounded-luxury"
+                        className="w-full h-full object-cover rounded-lg"
                         onError={(e) => {
                           e.target.style.display = 'none';
                           e.target.parentElement.innerHTML = `
-                            <div class="w-full h-full flex items-center justify-center bg-gray-100 rounded-luxury">
-                              <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="w-full h-full flex items-center justify-center bg-gray-100 rounded-lg">
+                              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                               </svg>
                             </div>
@@ -239,30 +300,30 @@ const Dashboard = () => {
                         }}
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-luxury">
-                        <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-lg">
+                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                         </svg>
                       </div>
                     )}
                   </div>
                   
-                  <div className="flex-1">
-                    <h4 className="font-medium text-text-primary">{hotel.name}</h4>
-                    <p className="text-sm text-text-secondary truncate">{hotel.address}</p>
-                    <div className="flex items-center mt-2">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium text-gray-900 truncate">{hotel.name}</h4>
+                    <p className="text-sm text-gray-600 truncate">{hotel.address}</p>
+                    <div className="flex items-center mt-1">
                       <div className="flex mr-2">
                         {renderStars(hotel.rating || 0)}
                       </div>
-                      <span className="text-xs text-text-secondary">({hotel.rating || 0})</span>
+                      <span className="text-xs text-gray-600">({hotel.rating || 0})</span>
                     </div>
                   </div>
-                  <div className="text-right ml-4">
-                    <p className="text-lg font-bold text-primary">{hotel.price_per_night} {hotel.currency}</p>
-                    <span className={`text-xs px-2 py-1 rounded-button font-medium ${
+                  <div className="text-right ml-2 flex-shrink-0">
+                    <p className="text-sm font-bold text-gray-900">{hotel.price_per_night} {hotel.currency}</p>
+                    <span className={`text-xs px-2 py-1 rounded font-medium block ${
                       hotel.is_active 
-                        ? 'bg-nature-100 text-nature-800' 
-                        : 'bg-red-100 text-red-800'
+                        ? 'bg-gray-100 text-gray-800' 
+                        : 'bg-gray-100 text-gray-800'
                     }`}>
                       {hotel.is_active ? 'Actif' : 'Inactif'}
                     </span>
@@ -273,12 +334,12 @@ const Dashboard = () => {
           </div>
           <Link 
             to="/hotels" 
-            className="block w-full text-center text-sm text-primary hover:text-primary-700 font-medium py-2 bg-primary-50 rounded-luxury hover:bg-primary-100 transition-all duration-300"
+            className="block text-center mt-6 text-gray-900 hover:text-gray-600 transition-colors font-medium"
           >
             Voir tous les hôtels →
           </Link>
         </div>
-      </div>
+      </section>
     </div>
   )
 }

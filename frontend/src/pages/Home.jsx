@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 const Home = () => {
   return (
     <div className="bg-white">
-      {/* Hero Section */}
+      {/* Hero Section correspondant exactement au design Figma */}
       <section className="relative bg-gray-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center">
@@ -32,7 +32,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Features Section moderne */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">

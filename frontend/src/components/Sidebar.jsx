@@ -71,16 +71,16 @@ const Sidebar = () => {
   ]
 
   return (
-    <div className="w-64 bg-white border-r border-gray-200 min-h-screen flex flex-col">
+    <div className="w-64 bg-gray-800 border-r border-gray-900 min-h-screen flex flex-col">
       {/* Logo */}
-      <div className="p-6 border-b border-gray-200">
+      <div className="p-6 border-b border-gray-700">
         <div className="flex items-center">
-          <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center mr-3 shadow-soft">
+          <div className="w-10 h-10 bg-gray-600 rounded-lg flex items-center justify-center mr-3">
             <span className="text-white font-bold text-xl">L</span>
           </div>
           <div>
-            <h1 className="text-xl font-bold text-text-primary">Luxe Hotels</h1>
-            <p className="text-xs text-text-secondary">Management</p>
+            <h1 className="text-xl font-bold text-white">Luxe Hotels</h1>
+            <p className="text-xs text-gray-300">Management</p>
           </div>
         </div>
       </div>
@@ -94,8 +94,8 @@ const Sidebar = () => {
                 to={item.path}
                 className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
                   isActive(item.path)
-                    ? 'bg-primary text-white shadow-soft'
-                    : 'text-text-secondary hover:bg-gray-50 hover:text-text-primary'
+                    ? 'bg-gray-700 text-white'
+                    : 'text-gray-300 hover:bg-gray-700 hover:text-white'
                 }`}
               >
                 <span className="mr-3">{item.icon}</span>
@@ -108,23 +108,23 @@ const Sidebar = () => {
 
       {/* User Section */}
       {isAuthenticated && (
-        <div className="p-4 border-t border-gray-200">
+        <div className="p-4 border-t border-gray-700">
           <div className="flex items-center mb-4">
-            <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mr-3">
-              <span className="text-text-primary font-sm">
+            <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center mr-3">
+              <span className="text-white font-sm">
                 {user?.first_name?.[0]?.toUpperCase() || 'A'}
               </span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-text-primary truncate">
+              <p className="text-sm font-medium text-white truncate">
                 {user?.first_name} {user?.last_name}
               </p>
-              <p className="text-xs text-text-secondary truncate">admin@luxehotels.com</p>
+              <p className="text-xs text-gray-300 truncate">admin@luxehotels.com</p>
             </div>
           </div>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-text-secondary bg-gray-50 rounded-lg hover:bg-gray-100 transition-all duration-200"
+            className="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-300 bg-gray-700 rounded-lg hover:bg-gray-600 transition-all duration-200"
           >
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>

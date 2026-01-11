@@ -1,21 +1,22 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user_model
 from django.conf import settings
 from django.http import HttpResponse, Http404
 from django.shortcuts import get_object_or_404
 import datetime
 import jwt
 import os
-from .models import Hotel, Room, Booking, User
+from .models import Hotel, Room, Booking
 from .serializers import (
     HotelSerializer, 
     RoomSerializer, 
     BookingSerializer, 
     UserSerializer
 )
-from mongoengine.queryset import QuerySet
+
+User = get_user_model()
 
 
 @api_view(['GET'])
@@ -40,48 +41,69 @@ def login_view(request):
     """
     Login user and return JWT token
     """
+    print(f"DEBUG: Requête reçue: {request.method}")
+    print(f"DEBUG: Données reçues: {request.data}")
+    
     email = request.data.get('email')
     password = request.data.get('password')
     
-    try:
-        # Pour MongoDB/MongoEngine, nous devons trouver l'utilisateur manuellement
-        user = User.objects.get(email=email)
-        
-        # Pour l'instant, nous allons considérer que l'authentification est réussie
-        # En production, vous devriez implémenter une vérification de mot de passe sécurisée
-        
-        # Créer un token JWT manuellement
-        payload = {
-            'user_id': str(user.id),
-            'email': user.email,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24),
-            'iat': datetime.datetime.utcnow()
-        }
-        
-        token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
-        
-        # Retourner uniquement les informations nécessaires
+    if not email or not password:
         return Response({
-            'user': {
-                'id': str(user.id),
-                'email': user.email,
-                'username': user.username,
-                'first_name': user.first_name,
-                'last_name': user.last_name,
-                'is_active': user.is_active
-            },
-            'token': token
-        }, status=status.HTTP_200_OK)
+            'error': 'Email et mot de passe sont requis'
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        # Récupérer l'utilisateur par email
+        user = User.objects.get(email=email)
+        print(f"DEBUG: Utilisateur trouvé: {user.email}")
         
+        # Authentifier avec le username de l'utilisateur
+        authenticated_user = authenticate(username=user.username, password=password)
+        print(f"DEBUG: Utilisateur authentifié: {authenticated_user is not None}")
+        
+        if authenticated_user is not None:
+            # Créer un token JWT manuellement
+            payload = {
+                'user_id': str(user.id),
+                'email': user.email,
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24),
+                'iat': datetime.datetime.utcnow()
+            }
+            
+            token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
+            print(f"DEBUG: Token généré: {token[:20]}...")
+            
+            response_data = {
+                'success': True,
+                'user': {
+                    'id': str(user.id),
+                    'email': user.email,
+                    'username': user.username,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name,
+                    'is_active': user.is_active
+                },
+                'token': token
+            }
+            
+            print(f"DEBUG: Réponse envoyée au frontend: {response_data}")
+            return Response(response_data, status=status.HTTP_200_OK)
+        else:
+            print(f"DEBUG: Échec d'authentification pour {email}")
+            return Response({
+                'error': 'Email ou mot de passe incorrect'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+            
     except User.DoesNotExist:
+        print(f"DEBUG: Utilisateur non trouvé: {email}")
         return Response({
             'error': 'Email ou mot de passe incorrect'
         }, status=status.HTTP_401_UNAUTHORIZED)
     except Exception as e:
-        print(f"Erreur connexion: {e}")
+        print(f"DEBUG: Erreur inattendue: {e}")
         return Response({
-            'error': 'Email ou mot de passe incorrect'
-        }, status=status.HTTP_401_UNAUTHORIZED)
+            'error': 'Erreur lors de la connexion'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['POST'])
@@ -89,14 +111,15 @@ def register_view(request):
     """
     Register new user and return JWT token
     """
+    print(f"DEBUG: Requête inscription reçue: {request.method}")
+    print(f"DEBUG: Données reçues: {request.data}")
+    
     serializer = UserSerializer(data=request.data)
     if serializer.is_valid():
         user = serializer.save()
+        print(f"DEBUG: Utilisateur créé: {user.email}")
         
         # Créer un token JWT manuellement
-        import jwt
-        from django.conf import settings
-        
         payload = {
             'user_id': str(user.id),
             'email': user.email,
@@ -105,6 +128,7 @@ def register_view(request):
         }
         
         token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
+        print(f"DEBUG: Token généré: {token[:20]}...")
         
         return Response({
             'user': {
@@ -114,13 +138,42 @@ def register_view(request):
                 'first_name': user.first_name,
                 'last_name': user.last_name,
                 'is_active': user.is_active,
-                'created_at': user.created_at.isoformat() if user.created_at else None
+                'date_joined': user.date_joined.isoformat() if user.date_joined else None
             },
             'token': token,
             'refresh': token  # Pour simplifier, on utilise le même token
         }, status=status.HTTP_201_CREATED)
     
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        print(f"DEBUG: Erreurs serializer: {serializer.errors}")
+        # Formatter le message d'erreur pour le frontend
+        error_messages = []
+        for field, errors in serializer.errors.items():
+            for error in errors:
+                error_messages.append(f"{field}: {error}")
+        
+        error_message = " | ".join(error_messages)
+        print(f"DEBUG: Message d'erreur formaté: {error_message}")
+        
+        # Messages d'erreur spécifiques et conviviaux
+        if 'email' in serializer.errors:
+            return Response({
+                'success': False,
+                'error': 'Cet email est déjà utilisé. Veuillez en choisir un autre.',
+                'type': 'email_exists'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        elif 'password' in serializer.errors or 'password_confirmation' in serializer.errors:
+            return Response({
+                'success': False,
+                'error': 'Les mots de passe ne correspondent pas ou sont invalides.',
+                'type': 'password_mismatch'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({
+                'success': False,
+                'error': error_message or 'Erreur lors de l\'inscription',
+                'type': 'general_error'
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET', 'POST'])
@@ -144,12 +197,12 @@ def hotel_list(request):
 @api_view(['GET', 'PUT', 'DELETE'])
 def hotel_detail(request, pk):
     """
-    Get, update or delete a hotel
+    Get, update or delete a specific hotel
     """
     try:
-        hotel = Hotel.objects.get(id=pk)
+        hotel = Hotel.objects.get(pk=pk)
     except Hotel.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response({'error': 'Hotel not found'}, status=status.HTTP_404_NOT_FOUND)
     
     if request.method == 'GET':
         serializer = HotelSerializer(hotel)
@@ -188,12 +241,12 @@ def room_list(request):
 @api_view(['GET', 'PUT', 'DELETE'])
 def room_detail(request, pk):
     """
-    Get, update or delete a room
+    Get, update or delete a specific room
     """
     try:
-        room = Room.objects.get(id=pk)
+        room = Room.objects.get(pk=pk)
     except Room.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response({'error': 'Room not found'}, status=status.HTTP_404_NOT_FOUND)
     
     if request.method == 'GET':
         serializer = RoomSerializer(room)
@@ -232,12 +285,12 @@ def booking_list(request):
 @api_view(['GET', 'PUT', 'DELETE'])
 def booking_detail(request, pk):
     """
-    Get, update or delete a booking
+    Get, update or delete a specific booking
     """
     try:
-        booking = Booking.objects.get(id=pk)
+        booking = Booking.objects.get(pk=pk)
     except Booking.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response({'error': 'Booking not found'}, status=status.HTTP_404_NOT_FOUND)
     
     if request.method == 'GET':
         serializer = BookingSerializer(booking)
@@ -268,27 +321,20 @@ def user_list(request):
     elif request.method == 'POST':
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.save()
-            # Créer un token JWT pour le nouvel utilisateur
-            from rest_framework_simplejwt.tokens import RefreshToken
-            refresh = RefreshToken.for_user(user)
-            return Response({
-                'user': serializer.data,
-                'token': str(refresh.access_token),
-                'refresh': str(refresh)
-            }, status=status.HTTP_201_CREATED)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def user_detail(request, pk):
     """
-    Get, update or delete a user
+    Get, update or delete a specific user
     """
     try:
-        user = User.objects.get(id=pk)
+        user = User.objects.get(pk=pk)
     except User.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
     
     if request.method == 'GET':
         serializer = UserSerializer(user)
@@ -306,72 +352,19 @@ def user_detail(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-def serve_image(request, image_path):
-    """
-    Servir les images des hôtels même en production
-    """
-    try:
-        # Construire le chemin complet du fichier
-        full_path = os.path.join(settings.MEDIA_ROOT, image_path)
-        
-        # Vérifier que le fichier existe
-        if not os.path.exists(full_path):
-            raise Http404("Image non trouvée")
-        
-        # Lire et servir le fichier
-        with open(full_path, 'rb') as f:
-            image_data = f.read()
-        
-        # Déterminer le type de contenu
-        content_type = 'image/jpeg'
-        if image_path.lower().endswith('.png'):
-            content_type = 'image/png'
-        elif image_path.lower().endswith('.gif'):
-            content_type = 'image/gif'
-        
-        return HttpResponse(image_data, content_type=content_type)
-        
-    except Exception as e:
-        raise Http404(f"Erreur lors du chargement de l'image: {str(e)}")
-
-
-# Vue alternative pour servir les images avec décorateur
-from django.views.decorators.http import require_GET
-from django.views.decorators.cache import cache_control
-
-@require_GET
-@cache_control(max_age=3600)  # Cache pendant 1 heure
 def serve_image_v2(request, image_path):
     """
-    Servir les images des hôtels même en production (version 2)
+    Servir les images uploadées
     """
-    try:
-        # Construire le chemin complet du fichier
-        full_path = os.path.join(settings.MEDIA_ROOT, image_path)
-        
-        # Vérifier que le fichier existe
-        if not os.path.exists(full_path):
-            raise Http404("Image non trouvée")
-        
-        # Lire et servir le fichier
-        with open(full_path, 'rb') as f:
+    import os
+    from django.http import HttpResponse
+    from django.conf import settings
+    
+    image_full_path = os.path.join(settings.MEDIA_ROOT, image_path)
+    
+    if os.path.exists(image_full_path):
+        with open(image_full_path, 'rb') as f:
             image_data = f.read()
-        
-        # Déterminer le type de contenu
-        content_type = 'image/jpeg'
-        if image_path.lower().endswith('.png'):
-            content_type = 'image/png'
-        elif image_path.lower().endswith('.gif'):
-            content_type = 'image/gif'
-        
-        # Créer la réponse avec les en-têtes CORS
-        response = HttpResponse(image_data, content_type=content_type)
-        response['Access-Control-Allow-Origin'] = '*'
-        response['Access-Control-Allow-Methods'] = 'GET'
-        response['Access-Control-Allow-Headers'] = 'Content-Type'
-        response['Cache-Control'] = 'public, max-age=3600'
-        
-        return response
-        
-    except Exception as e:
-        raise Http404(f"Erreur lors du chargement de l'image: {str(e)}")
+            return HttpResponse(image_data, content_type='image/jpeg')
+    
+    return HttpResponse(status=404)
