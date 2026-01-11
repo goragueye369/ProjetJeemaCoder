@@ -5,6 +5,13 @@ const Sidebar = () => {
   const location = useLocation()
   const { user, logout, isAuthenticated } = useAuth()
 
+  console.log('Sidebar - User actuel:', user)
+  console.log('Sidebar - User email:', user?.email)
+  console.log('Sidebar - User username:', user?.username)
+  console.log('Sidebar - User first_name:', user?.first_name)
+  console.log('Sidebar - User last_name:', user?.last_name)
+  console.log('Sidebar - isAuthenticated:', isAuthenticated)
+
   const handleLogout = async () => {
     await logout()
     window.location.href = '/login'
@@ -112,14 +119,19 @@ const Sidebar = () => {
           <div className="flex items-center mb-4">
             <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center mr-3">
               <span className="text-white font-sm">
-                {user?.first_name?.[0]?.toUpperCase() || 'A'}
+                {user?.first_name?.[0]?.toUpperCase() || 
+                 user?.username?.[0]?.toUpperCase() || 
+                 'A'}
               </span>
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-white truncate">
-                {user?.first_name} {user?.last_name}
+                {user?.first_name && user?.last_name 
+                  ? `${user.first_name} ${user.last_name}`
+                  : user?.username || 'Admin'
+                }
               </p>
-              <p className="text-xs text-gray-300 truncate">admin@luxehotels.com</p>
+              <p className="text-xs text-gray-300 truncate">{user?.email || 'admin@luxehotels.com'}</p>
             </div>
           </div>
           <button

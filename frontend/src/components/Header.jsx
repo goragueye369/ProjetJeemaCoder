@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
 
 const Header = () => {
+  const { user } = useAuth()
+
   return (
     <header className="bg-white border-b border-gray-200">
       <div className="px-6 py-4">
@@ -34,11 +37,20 @@ const Header = () => {
             {/* User Profile */}
             <div className="flex items-center space-x-3 pl-4 border-l border-gray-200">
               <div className="text-right hidden md:block">
-                <p className="text-sm font-medium text-text-primary">Admin User</p>
-                <p className="text-xs text-text-secondary">admin@luxehotels.com</p>
+                <p className="text-sm font-medium text-text-primary">
+                  {user?.first_name && user?.last_name 
+                    ? `${user.first_name} ${user.last_name}`
+                    : user?.username || 'Admin User'
+                  }
+                </p>
+                <p className="text-xs text-text-secondary">{user?.email || 'admin@luxehotels.com'}</p>
               </div>
               <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                <span className="text-text-primary text-sm font-medium">A</span>
+                <span className="text-text-primary text-sm font-medium">
+                  {user?.first_name?.[0]?.toUpperCase() || 
+                   user?.username?.[0]?.toUpperCase() || 
+                   'A'}
+                </span>
               </div>
             </div>
           </div>

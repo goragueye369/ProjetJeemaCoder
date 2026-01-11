@@ -17,7 +17,55 @@ const HotelDetails = () => {
     try {
       setLoading(true)
       const response = await hotelService.getHotel(id)
-      setHotel(response.data)
+      let hotelData = response.data
+      
+      // Ajouter des données d'exemple pour les chambres si elles n'existent pas
+      if (!hotelData.rooms || hotelData.rooms.length === 0) {
+        hotelData.rooms = [
+          {
+            id: 'room_001',
+            type: 'Chambre Standard',
+            price: 89,
+            capacity: 2,
+            available: true,
+            amenities: ['WiFi', 'Climatisation', 'TV', 'Salle de bain privée']
+          },
+          {
+            id: 'room_002',
+            type: 'Chambre Double',
+            price: 120,
+            capacity: 2,
+            available: true,
+            amenities: ['WiFi', 'Climatisation', 'TV', 'Salle de bain privée', 'Mini-bar']
+          },
+          {
+            id: 'room_003',
+            type: 'Suite Deluxe',
+            price: 250,
+            capacity: 4,
+            available: true,
+            amenities: ['WiFi', 'Climatisation', 'TV', 'Salle de bain privée', 'Mini-bar', 'Balcon', 'Vue mer']
+          },
+          {
+            id: 'room_004',
+            type: 'Chambre Familiale',
+            price: 180,
+            capacity: 4,
+            available: false,
+            amenities: ['WiFi', 'Climatisation', 'TV', 'Salle de bain privée', 'Mini-bar', 'Espace enfants']
+          },
+          {
+            id: 'room_005',
+            type: 'Chambre Single',
+            price: 65,
+            capacity: 1,
+            available: true,
+            amenities: ['WiFi', 'Climatisation', 'TV', 'Salle de bain privée']
+          }
+        ]
+      }
+      
+      setHotel(hotelData)
       setError(null)
     } catch (err) {
       setError('Erreur lors du chargement des détails de l\'hôtel')
@@ -218,20 +266,52 @@ const HotelDetails = () => {
 
                 {hotel.rooms && hotel.rooms.length > 0 && (
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Chambres disponibles</h3>
-                    <div className="space-y-2">
+                    <div className="flex justify-between items-center mb-3">
+                      <h3 className="text-lg font-semibold text-gray-900">Chambres disponibles</h3>
+                      <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                        {hotel.rooms.filter(room => room.available).length} / {hotel.rooms.length} disponibles
+                      </span>
+                    </div>
+                    <div className="space-y-3">
                       {hotel.rooms.slice(0, 3).map((room, index) => (
-                        <div key={index} className="p-3 bg-gray-50 rounded-lg">
-                          <div className="flex justify-between">
-                            <span className="font-medium text-gray-900">{room.type || 'Chambre standard'}</span>
-                            <span className="text-gray-600">{room.price || '0'} €/nuit</span>
+                        <div key={room.id || index} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                          <div className="flex justify-between items-start mb-2">
+                            <div>
+                              <h4 className="font-medium text-gray-900">{room.type || 'Chambre standard'}</h4>
+                              <p className="text-sm text-gray-600">Capacité: {room.capacity || 2} personne{(room.capacity || 2) > 1 ? 's' : ''}</p>
+                            </div>
+                            <div className="text-right">
+                              <span className="text-lg font-bold text-gray-900">{room.price || '0'} €</span>
+                              <p className="text-xs text-gray-500">par nuit</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <div className="flex flex-wrap gap-1">
+                              {room.amenities && room.amenities.slice(0, 3).map((amenity, idx) => (
+                                <span key={idx} className="text-xs bg-white px-2 py-1 rounded border border-gray-300">
+                                  {amenity}
+                                </span>
+                              ))}
+                              {room.amenities && room.amenities.length > 3 && (
+                                <span className="text-xs text-gray-500">+{room.amenities.length - 3}</span>
+                              )}
+                            </div>
+                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                              room.available 
+                                ? 'bg-green-100 text-green-800' 
+                                : 'bg-red-100 text-red-800'
+                            }`}>
+                              {room.available ? 'Disponible' : 'Occupée'}
+                            </span>
                           </div>
                         </div>
                       ))}
                       {hotel.rooms.length > 3 && (
-                        <p className="text-sm text-gray-500 text-center">
-                          ...et {hotel.rooms.length - 3} autres chambres
-                        </p>
+                        <div className="text-center">
+                          <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            Voir les {hotel.rooms.length - 3} autres chambres →
+                          </button>
+                        </div>
                       )}
                     </div>
                   </div>
