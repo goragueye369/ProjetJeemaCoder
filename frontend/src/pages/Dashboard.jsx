@@ -59,18 +59,42 @@ const Dashboard = () => {
           }
         }
         
-        // Attendre un peu puis rafraîchir les données
-        setTimeout(() => {
-          window.location.reload()
-        }, 2000)
+        // Attendre un peu puis récupérer les données à jour
+        setTimeout(async () => {
+          console.log('Récupération des données mises à jour...')
+          try {
+            const [hotelsResponse2, bookingsResponse2, usersResponse2] = await Promise.all([
+              hotelService.getAllHotels(),
+              bookingService.getAllBookings(),
+              userService.getAllUsers()
+            ])
+
+            const hotels2 = hotelsResponse2.data
+            const bookings2 = bookingsResponse2.data
+            const users2 = usersResponse2.data
+
+            const totalRooms2 = hotels2.reduce((acc, hotel) => acc + (hotel.rooms?.length || 0), 0)
+            
+            console.log(`Nouvelles données - Hôtels: ${hotels2.length}, Chambres: ${totalRooms2}`)
+            
+            setStats({
+              hotels: hotels2.length,
+              rooms: totalRooms2,
+              bookings: bookings2.length,
+              users: users2.length
+            })
+          } catch (error) {
+            console.error('Erreur lors de la récupération des données mises à jour:', error)
+          }
+        }, 3000)
+      } else {
+        setStats({
+          hotels: hotels.length,
+          rooms: totalRooms,
+          bookings: bookings.length,
+          users: users.length
+        })
       }
-      
-      setStats({
-        hotels: hotels.length,
-        rooms: totalRooms,
-        bookings: bookings.length,
-        users: users.length
-      })
 
       // Prendre les 3 hôtels les plus récents
       setRecentHotels(hotels.slice(0, 3))
