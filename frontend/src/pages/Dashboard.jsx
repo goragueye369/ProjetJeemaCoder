@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import React, { useState, useEffect } from 'react'
-import { hotelService, bookingService } from '../services/api'
+import { hotelService, bookingService, userService } from '../services/api'
 import config from '../config/constants'
 
 const Dashboard = () => {
