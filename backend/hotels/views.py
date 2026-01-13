@@ -31,7 +31,8 @@ def api_root(request):
         'users': '/api/users/',
         'auth': {
             'login': '/api/auth/login/',
-            'register': '/api/auth/register/'
+            'register': '/api/auth/register/',
+            'logout': '/api/auth/logout/'
         }
     })
 
@@ -367,4 +368,13 @@ def serve_image_v2(request, image_path):
             image_data = f.read()
             return HttpResponse(image_data, content_type='image/jpeg')
     
-    return HttpResponse(status=404)
+
+@api_view(['POST'])
+def logout_view(request):
+    """
+    Logout user - simple response for frontend
+    """
+    return Response({
+        'success': True,
+        'message': 'Déconnexion réussie'
+    }, status=status.HTTP_200_OK)
