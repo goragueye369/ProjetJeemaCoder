@@ -16,6 +16,24 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchDashboardData()
+    
+    // Optimiser les logs - uniquement en mode développement
+    if (process.env.NODE_ENV === 'development') {
+      const originalLog = console.log
+      console.log = (...args) => {
+        if (args[0] && typeof args[0] === 'string' && 
+            (args[0].includes('Création de chambres') || 
+             args[0].includes('Chambre déjà existante') ||
+             args[0].includes('Erreur création chambre'))) {
+          return // Ignorer les logs de création de chambres
+        }
+        originalLog(...args)
+      }
+      
+      return () => {
+        console.log = originalLog
+      }
+    }
   }, [])
 
   const fetchDashboardData = async () => {
@@ -36,32 +54,38 @@ const Dashboard = () => {
       // Calculer les statistiques
       const totalRooms = hotels.reduce((acc, hotel) => acc + (hotel.rooms?.length || 0), 0)
       
-      // Si aucune chambre, créer des chambres par défaut pour chaque hôtel
+      // Si aucune chambre, créer des chambres par défaut pour chaque hôtel (une seule fois)
       if (totalRooms === 0 && hotels.length > 0) {
-        console.log('Création de chambres par défaut pour les hôtels...')
+        // console.log('Création de chambres par défaut pour les hôtels...')
         
-        // Créer 3 chambres par hôtel
+        // Créer 3 chambres par hôtel en parallèle pour plus de rapidité
+        const roomPromises = []
         for (const hotel of hotels) {
           for (let i = 1; i <= 3; i++) {
-            try {
-              await api.post('/rooms/', {
+            roomPromises.push(
+              api.post('/rooms/', {
                 hotel: hotel.id,
                 room_number: `${i}01`,
                 room_type: i === 1 ? 'Suite' : i === 2 ? 'Double' : 'Simple',
-                capacity: i === 1 ? '4' : i === 2 ? '2' : '1', // String pour CharField
+                capacity: i === 1 ? '4' : i === 2 ? '2' : '1',
                 price_per_night: i === 1 ? '250.00' : i === 2 ? '150.00' : '80.00',
                 is_available: true
+              }).catch(error => {
+                // Ignorer les erreurs de doublons
+                if (error.response?.status !== 500) {
+                  // console.log(`Erreur création chambre ${i}:`, error.message)
+                }
               })
-              console.log(`Chambre ${i}01 créée pour hôtel ${hotel.id}`)
-            } catch (error) {
-              console.log(`Chambre déjà existante ou erreur pour hôtel ${hotel.id}:`, error.message)
-            }
+            )
           }
         }
         
-        // Attendre un peu puis récupérer les données à jour
+        // Attendre toutes les créations en parallèle
+        await Promise.all(roomPromises)
+        // console.log('Création de chambres terminée')
+        
+        // Récupérer les données mises à jour une seule fois
         setTimeout(async () => {
-          console.log('Récupération des données mises à jour...')
           try {
             const [hotelsResponse2, bookingsResponse2, usersResponse2] = await Promise.all([
               hotelService.getAllHotels(),
@@ -75,7 +99,7 @@ const Dashboard = () => {
 
             const totalRooms2 = hotels2.reduce((acc, hotel) => acc + (hotel.rooms?.length || 0), 0)
             
-            console.log(`Nouvelles données - Hôtels: ${hotels2.length}, Chambres: ${totalRooms2}`)
+            // console.log(`Nouvelles données - Hôtels: ${hotels2.length}, Chambres: ${totalRooms2}`)
             
             setStats({
               hotels: hotels2.length,
@@ -84,9 +108,9 @@ const Dashboard = () => {
               users: users2.length
             })
           } catch (error) {
-            console.error('Erreur lors de la récupération des données mises à jour:', error)
+            // console.error('Erreur lors de la récupération des données mises à jour:', error)
           }
-        }, 3000)
+        }, 2000)
       } else {
         setStats({
           hotels: hotels.length,
@@ -334,7 +358,7 @@ const Dashboard = () => {
                 Aucun hôtel trouvé dans la base de données
               </div>
             ) : (
-              recentHotels.map((hotel, index) => (
+              {recentHotels.map((hotel, index) => (
                 <div key={hotel.id || index} className="flex items-center p-3 bg-luxury-50 rounded-luxury hover:bg-luxury-100 transition-all duration-200 cursor-pointer">
                   {/* Image de l'hôtel */}
                   <div className="w-12 h-12 bg-gray-200 rounded-lg mr-3 flex-shrink-0">
@@ -384,7 +408,7 @@ const Dashboard = () => {
                     </span>
                   </div>
                 </div>
-              ))
+              ))}
             )}
           </div>
           <Link 

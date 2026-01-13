@@ -139,21 +139,18 @@ export const AuthProvider = ({ children }) => {
   }
 
   const logout = async () => {
-    console.log('AuthContext - Déconnexion')
+    // console.log('AuthContext - Déconnexion')
     
-    // Appeler l'API logout directement avec api
-    try {
-      const response = await api.post('/auth/logout/')
-      console.log('Logout API response:', response.data)
-    } catch (error) {
-      console.error('Logout API error:', error)
-    }
-    
-    // Vider le localStorage et l'état
+    // Vider le localStorage et l'état d'abord
     localStorage.removeItem('token')
     localStorage.removeItem('user')
     setUser(null)
     setIsAuthenticated(false)
+    
+    // Appeler l'API logout en arrière-plan (ne pas bloquer)
+    api.post('/auth/logout/').catch(error => {
+      // console.warn('Logout API warning:', error)
+    })
   }
 
   const value = {

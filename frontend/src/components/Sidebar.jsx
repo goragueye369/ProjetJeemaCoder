@@ -5,15 +5,22 @@ const Sidebar = () => {
   const location = useLocation()
   const { user, logout, isAuthenticated } = useAuth()
 
-  console.log('Sidebar - User actuel:', user)
-  console.log('Sidebar - User email:', user?.email)
-  console.log('Sidebar - User username:', user?.username)
-  console.log('Sidebar - User first_name:', user?.first_name)
-  console.log('Sidebar - User last_name:', user?.last_name)
-  console.log('Sidebar - isAuthenticated:', isAuthenticated)
+  // Supprimer les logs pour améliorer la performance
+  // console.log('Sidebar - User actuel:', user)
+  // console.log('Sidebar - User email:', user?.email)
+  // console.log('Sidebar - User username:', user?.username)
+  // console.log('Sidebar - User first_name:', user?.first_name)
+  // console.log('Sidebar - User last_name:', user?.last_name)
+  // console.log('Sidebar - isAuthenticated:', isAuthenticated)
 
   const handleLogout = async () => {
     await logout()
+    window.location.href = '/login'
+  }
+
+  // Version synchrone alternative si await ne fonctionne pas
+  const handleLogoutSync = () => {
+    logout()  // Appeler logout sans await
     window.location.href = '/login'
   }
 
@@ -135,7 +142,7 @@ const Sidebar = () => {
             </div>
           </div>
           <button
-            onClick={handleLogout}
+            onClick={handleLogoutSync}
             className="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-300 bg-gray-700 rounded-lg hover:bg-gray-600 transition-all duration-200"
           >
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
