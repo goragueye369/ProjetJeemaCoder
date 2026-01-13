@@ -241,3 +241,19 @@ SIMPLE_JWT = {
     'USER_ID_FIELD': 'id',
     'USER_ID_CLAIM': 'user_id',
 }
+
+# Configuration des URLs pour le déploiement
+if 'RENDER' in os.environ or not DEBUG:
+    # Production sur Render
+    SITE_URL = 'https://projetjeemacoder.onrender.com'
+else:
+    # Développement local
+    SITE_URL = 'http://127.0.0.1:8000'
+
+# Media files configuration
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Static files configuration
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')

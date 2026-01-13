@@ -133,12 +133,12 @@ class HotelSerializer(serializers.Serializer):
                 image_url = obj.image.url
                 # Convertir en URL absolue si nécessaire
                 if image_url.startswith('/'):
-                    base_url = getattr(settings, 'BASE_URL', 'http://127.0.0.1:8000')
+                    base_url = getattr(settings, 'SITE_URL', 'http://127.0.0.1:8000')
                     return f"{base_url}{image_url}"
                 return image_url
             # Si l'image est une chaîne de caractères (chemin du fichier)
             elif isinstance(obj.image, str):
-                base_url = getattr(settings, 'BASE_URL', 'http://127.0.0.1:8000')
+                base_url = getattr(settings, 'SITE_URL', 'http://127.0.0.1:8000')
                 return f"{base_url}/media/{obj.image}"
         return None
 
