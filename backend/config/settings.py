@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-w^)p84u^t@v_c(@f)1qslg7xu244#_0owe)6%5)*vw#&e9dm=0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', 'projetjeemacoder.onrender.com']
 
 
 # Application definition
@@ -166,10 +166,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
     "http://localhost:5174",
     "http://127.0.0.1:5174",
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "http://localhost:8080",
-    "http://127.0.0.1:8080",
+    "https://projetjeemacoder.onrender.com",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
