@@ -411,7 +411,7 @@ const Dashboard = () => {
         </span>
       </div>
     </div>
-  ))}
+  ))
             )}
           </div>
           <Link 
