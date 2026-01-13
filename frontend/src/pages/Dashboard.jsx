@@ -52,31 +52,25 @@ const Dashboard = () => {
                 price_per_night: i === 1 ? '250.00' : i === 2 ? '150.00' : '80.00',
                 is_available: true
               })
+              console.log(`Chambre ${i}01 créée pour hôtel ${hotel.id}`)
             } catch (error) {
-              console.log(`Chambre déjà existante pour hôtel ${hotel.id}`)
+              console.log(`Chambre déjà existante ou erreur pour hôtel ${hotel.id}:`, error.message)
             }
           }
         }
         
-        // Récupérer les hôtels à nouveau pour avoir les chambres
-        const hotelsResponse2 = await hotelService.getAllHotels()
-        const hotelsWithRooms = hotelsResponse2.data
-        const totalRoomsWithRooms = hotelsWithRooms.reduce((acc, hotel) => acc + (hotel.rooms?.length || 0), 0)
-        
-        setStats({
-          hotels: hotels.length,
-          rooms: totalRoomsWithRooms,
-          bookings: bookings.length,
-          users: users.length
-        })
-      } else {
-        setStats({
-          hotels: hotels.length,
-          rooms: totalRooms,
-          bookings: bookings.length,
-          users: users.length
-        })
+        // Attendre un peu puis rafraîchir les données
+        setTimeout(() => {
+          window.location.reload()
+        }, 2000)
       }
+      
+      setStats({
+        hotels: hotels.length,
+        rooms: totalRooms,
+        bookings: bookings.length,
+        users: users.length
+      })
 
       // Prendre les 3 hôtels les plus récents
       setRecentHotels(hotels.slice(0, 3))
