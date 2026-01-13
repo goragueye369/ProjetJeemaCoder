@@ -137,12 +137,22 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
-  const logout = () => {
+  const logout = async () => {
     console.log('AuthContext - Déconnexion')
+    
+    // Appeler l'API logout
+    try {
+      const response = await authService.post('/auth/logout/')
+      console.log('Logout API response:', response.data)
+    } catch (error) {
+      console.error('Logout API error:', error)
+    }
+    
+    // Vider le localStorage et l'état
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
     setUser(null)
     setIsAuthenticated(false)
-    localStorage.removeItem('user')
-    localStorage.removeItem('token')
   }
 
   const value = {
