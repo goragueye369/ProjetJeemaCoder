@@ -4,6 +4,7 @@
   "outputDirectory": "dist",
   "installCommand": "npm install --force",
   "buildCommand": "npm run build -- --mode production",
+  "functions": {},
   "routes": [
     { "src": "/api/(.*)", "dest": "/api" }
   ],
