@@ -80,7 +80,7 @@ const CreateHotel = () => {
               hotel: hotelId,
               room_number: `${i}01`,
               room_type: i === 1 ? 'Suite' : i === 2 ? 'Double' : 'Simple',
-              capacity: i === 1 ? '4' : i === 2 ? '2' : '1',
+              capacity: i === 1 ? '4' : i === 2 ? '2' : '1', // String pour CharField
               price_per_night: i === 1 ? '250.00' : i === 2 ? '150.00' : '80.00',
               is_available: true
             })
