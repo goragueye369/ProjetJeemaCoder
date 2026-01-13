@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { hotelService } from '../services/api'
+import api from '../services/api'
 
 const CreateHotel = () => {
   const navigate = useNavigate()
@@ -17,7 +18,8 @@ const CreateHotel = () => {
     currency: 'XOF',
     rating: '0.0',
     is_active: true,
-    image: null
+    image: null,
+    number_of_rooms: ''
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -66,6 +68,27 @@ const CreateHotel = () => {
       // Envoyer à l'API
       const response = await hotelService.createHotel(dataToSend)
       console.log('Réponse de l\'API:', response.data)
+      
+      // Créer automatiquement les chambres si un nombre est spécifié
+      if (formData.number_of_rooms && formData.number_of_rooms > 0) {
+        const hotelId = response.data.id
+        console.log(`Création de ${formData.number_of_rooms} chambres pour l'hôtel ${hotelId}`)
+        
+        for (let i = 1; i <= formData.number_of_rooms; i++) {
+          try {
+            await api.post('/rooms/', {
+              hotel: hotelId,
+              room_number: `${i}01`,
+              room_type: i === 1 ? 'Suite' : i === 2 ? 'Double' : 'Simple',
+              capacity: i === 1 ? '4' : i === 2 ? '2' : '1',
+              price_per_night: i === 1 ? '250.00' : i === 2 ? '150.00' : '80.00',
+              is_available: true
+            })
+          } catch (error) {
+            console.log(`Erreur création chambre ${i}:`, error)
+          }
+        }
+      }
       
       // Redirection immédiate en cas de succès
       navigate('/hotels')
@@ -219,6 +242,24 @@ const CreateHotel = () => {
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                 placeholder="+221 777 777 77"
+              />
+            </div>
+
+            {/* Nombre de chambres */}
+            <div>
+              <label htmlFor="number_of_rooms" className="block text-sm font-medium text-gray-700 mb-2">
+                Nombre de chambres *
+              </label>
+              <input
+                type="number"
+                id="number_of_rooms"
+                name="number_of_rooms"
+                required
+                value={formData.number_of_rooms}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                placeholder="10"
+                min="1"
               />
             </div>
 

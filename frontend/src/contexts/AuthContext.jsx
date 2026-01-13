@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { authService } from '../services/api'
+import api from '../services/api'
 
 const AuthContext = createContext()
 
@@ -140,9 +141,9 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     console.log('AuthContext - Déconnexion')
     
-    // Appeler l'API logout
+    // Appeler l'API logout directement avec api
     try {
-      const response = await authService.post('/auth/logout/')
+      const response = await api.post('/auth/logout/')
       console.log('Logout API response:', response.data)
     } catch (error) {
       console.error('Logout API error:', error)
