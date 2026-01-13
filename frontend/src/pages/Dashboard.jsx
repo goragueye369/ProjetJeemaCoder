@@ -358,57 +358,61 @@ const Dashboard = () => {
                 Aucun hôtel trouvé dans la base de données
               </div>
             ) : (
-              {recentHotels.map((hotel, index) => (
-                <div key={hotel.id || index} className="flex items-center p-3 bg-luxury-50 rounded-luxury hover:bg-luxury-100 transition-all duration-200 cursor-pointer">
-                  {/* Image de l'hôtel */}
-                  <div className="w-12 h-12 bg-gray-200 rounded-lg mr-3 flex-shrink-0">
-                    {hotel.image_url ? (
-                      <img 
-                        src={`${config.BASE_URL}${hotel.image_url}`} 
-                        alt={hotel.name}
-                        className="w-full h-full object-cover rounded-lg"
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                          e.target.parentElement.innerHTML = `
-                            <div class="w-full h-full flex items-center justify-center bg-gray-100 rounded-lg">
-                              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                              </svg>
-                            </div>
-                          `;
-                        }}
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-lg">
-                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                        </svg>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-gray-900 truncate">{hotel.name}</h4>
-                    <p className="text-sm text-gray-600 truncate">{hotel.address}</p>
-                    <div className="flex items-center mt-1">
-                      <div className="flex mr-2">
-                        {renderStars(hotel.rating || 0)}
-                      </div>
-                      <span className="text-xs text-gray-600">({hotel.rating || 0})</span>
-                    </div>
-                  </div>
-                  <div className="text-right ml-2 flex-shrink-0">
-                    <p className="text-sm font-bold text-gray-900">{hotel.price_per_night} {hotel.currency}</p>
-                    <span className={`text-xs px-2 py-1 rounded font-medium block ${
-                      hotel.is_active 
-                        ? 'bg-gray-100 text-gray-800' 
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {hotel.is_active ? 'Actif' : 'Inactif'}
-                    </span>
-                  </div>
-                </div>
-              ))}
+              // Fonction pour gérer les erreurs d'images
+  const handleImageError = (e) => {
+    e.target.style.display = 'none';
+    e.target.parentElement.innerHTML = `
+      <div class="w-full h-full flex items-center justify-center bg-gray-100 rounded-lg">
+        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+        </svg>
+      </div>
+    `;
+  };
+
+  // Plus loin dans le code...
+  {recentHotels.map((hotel, index) => (
+    <div key={hotel.id || index} className="flex items-center p-3 bg-luxury-50 rounded-luxury hover:bg-luxury-100 transition-all duration-200 cursor-pointer">
+      {/* Image de l'hôtel */}
+      <div className="w-12 h-12 bg-gray-200 rounded-lg mr-3 flex-shrink-0">
+        {hotel.image_url ? (
+          <img 
+            src={`${config.BASE_URL}${hotel.image_url}`} 
+            alt={hotel.name}
+            className="w-full h-full object-cover rounded-lg"
+            onError={handleImageError}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-lg">
+            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+            </svg>
+          </div>
+        )}
+      </div>
+      
+      <div className="flex-1 min-w-0">
+        <h4 className="font-medium text-gray-900 truncate">{hotel.name}</h4>
+        <p className="text-sm text-gray-600 truncate">{hotel.address}</p>
+        <div className="flex items-center mt-1">
+          <div className="flex mr-2">
+            {renderStars(hotel.rating || 0)}
+          </div>
+          <span className="text-xs text-gray-600">({hotel.rating || 0})</span>
+        </div>
+      </div>
+      <div className="text-right ml-2 flex-shrink-0">
+        <p className="text-sm font-bold text-gray-900">{hotel.price_per_night} {hotel.currency}</p>
+        <span className={`text-xs px-2 py-1 rounded font-medium block ${
+          hotel.is_active 
+            ? 'bg-gray-100 text-gray-800' 
+            : 'bg-gray-100 text-gray-800'
+        }`}>
+          {hotel.is_active ? 'Actif' : 'Inactif'}
+        </span>
+      </div>
+    </div>
+  ))}
             )}
           </div>
           <Link 
