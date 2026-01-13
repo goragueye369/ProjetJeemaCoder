@@ -1,8 +1,9 @@
 import axios from 'axios'
+import config from '../config/constants'
 
 // Configuration de base pour axios
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api', // Backend Django API
+  baseURL: config.API_BASE_URL, // URL dynamique selon l'environnement
   headers: {
     'Content-Type': 'application/json',
   },

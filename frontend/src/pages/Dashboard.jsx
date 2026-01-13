@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
-import { useState, useEffect } from 'react'
-import { hotelService, bookingService, userService } from '../services/api'
+import React, { useState, useEffect } from 'react'
+import { hotelService, bookingService } from '../services/api'
+import config from '../config/constants'
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -285,7 +286,7 @@ const Dashboard = () => {
                   <div className="w-12 h-12 bg-gray-200 rounded-lg mr-3 flex-shrink-0">
                     {hotel.image_url ? (
                       <img 
-                        src={`http://localhost:8000${hotel.image_url}`} 
+                        src={`${config.BASE_URL}${hotel.image_url}`} 
                         alt={hotel.name}
                         className="w-full h-full object-cover rounded-lg"
                         onError={(e) => {
