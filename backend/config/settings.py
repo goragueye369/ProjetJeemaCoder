@@ -83,10 +83,10 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'hotels_db',
-        'USER': 'postgres',
-        'PASSWORD': 'gora369',
-        'HOST': 'localhost',
+        'NAME': 'goragueye_hotels_db',
+        'USER': 'goragueye',
+        'PASSWORD': 'gora@369',
+        'HOST': 'postgresql-goragueye.alwaysdata.net',
         'PORT': '5432',
     }
 }

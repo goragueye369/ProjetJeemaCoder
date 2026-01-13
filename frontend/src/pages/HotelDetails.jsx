@@ -8,6 +8,7 @@ const HotelDetails = () => {
   const [hotel, setHotel] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [showAllRooms, setShowAllRooms] = useState(false)
 
   useEffect(() => {
     fetchHotelDetails()
@@ -273,7 +274,7 @@ const HotelDetails = () => {
                       </span>
                     </div>
                     <div className="space-y-3">
-                      {hotel.rooms.slice(0, 3).map((room, index) => (
+                      {(showAllRooms ? hotel.rooms : hotel.rooms.slice(0, 3)).map((room, index) => (
                         <div key={room.id || index} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
                           <div className="flex justify-between items-start mb-2">
                             <div>
@@ -308,8 +309,11 @@ const HotelDetails = () => {
                       ))}
                       {hotel.rooms.length > 3 && (
                         <div className="text-center">
-                          <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                            Voir les {hotel.rooms.length - 3} autres chambres →
+                          <button 
+                            onClick={() => setShowAllRooms(!showAllRooms)}
+                            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                          >
+                            {showAllRooms ? 'Afficher moins' : `Voir les ${hotel.rooms.length - 3} autres chambres →`}
                           </button>
                         </div>
                       )}
