@@ -15,13 +15,15 @@ const Sidebar = () => {
 
   const handleLogout = async () => {
     await logout()
-    window.location.href = '/login'
+    // Force la redirection vers login avec window.location pour éviter les boucles
+    window.location.replace('/login')
   }
 
   // Version synchrone alternative si await ne fonctionne pas
   const handleLogoutSync = () => {
     logout()  // Appeler logout sans await
-    window.location.href = '/login'
+    // Force la redirection vers login avec window.location pour éviter les boucles
+    window.location.replace('/login')
   }
 
   const isActive = (path) => location.pathname === path

@@ -141,11 +141,14 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     // console.log('AuthContext - Déconnexion')
     
-    // Vider le localStorage et l'état d'abord
+    // Vider le localStorage et l'état D'ABORD
     localStorage.removeItem('token')
     localStorage.removeItem('user')
     setUser(null)
     setIsAuthenticated(false)
+    
+    // Forcer un petit délai pour s'assurer que l'état est bien mis à jour
+    await new Promise(resolve => setTimeout(resolve, 100))
     
     // Appeler l'API logout en arrière-plan (ne pas bloquer)
     api.post('/auth/logout/').catch(error => {
